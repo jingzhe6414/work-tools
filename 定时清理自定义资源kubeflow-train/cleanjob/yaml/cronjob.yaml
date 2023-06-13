@@ -1,0 +1,16 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: hello
+spec:
+  schedule: "* * 1 * *"
+  jobTemplate:
+    spec:
+
+      template:
+        spec:
+          containers:
+            - name: clean
+              image:  192.168.2.106:1180/fangzhou/cleanjob:v6
+              imagePullPolicy: IfNotPresent
+          restartPolicy: OnFailure
