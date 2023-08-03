@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: webhook
+  name: webhook
+  namespace: monitoring-system
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: webhook
+  template:
+    metadata:
+      labels:
+        app: webhook
+    spec:
+      containers:
+        - name: webhook
+          image: 192.168.2.106:1180/fangzhou/webhook:pro2
+          command: ["./webhook"]
+          env:
+            - name: REDIS_DB
+              value: "0"
+            - name: REDIS_IP
+              value: "redis.fzzn-system.svc:6379"
+            - name: REDIS_PWD
+              value: ""
+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: notification-manager-svc # 资源名称，必须与Endpoints中metadata.name相同
+  namespace: monitoring-system    # 资源命名空间，必须与Endpoints中metadata.namespace相同
+spec:
+  selector:
+    app: webhook
+  type: ClusterIP     # 如果为ClusterIP模式，配置为：type: ClusterIP
+  ports:
+    - port: 19093      # 集群内部使用的端口
+      name: webhook        # 必须与Endpoints中定义的端口名相同
